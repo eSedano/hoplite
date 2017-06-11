@@ -1,0 +1,32 @@
+#  @author  Enrique Sedano
+#  @version  0.14.07
+#
+#  Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+#
+{
+# Absolute path to the LLVM root folder.
+'llvm_path': '/home/esedano/llvm',
+
+# Input tool to get the system graph information from.
+'input_tool': 'llvm',
+
+# Analytical or simulation-based model for signal and noise.
+'model': 'pce',
+
+# Parameters for PCE
+'pce_order':          4,
+'pce_partition_size': 4,
+
+# Parameters for PCE with conditionals.
+'pce_cond_order':          3,
+'pce_cond_partition_size': 4,
+'pce_cond_j_lim':      10e-2,
+
+# Parameters for ME-gPC
+'megpc_order':           3,
+'megpc_partition_size':  4,
+'megpc_j_lim':       10e-2,
+'megpc_theta_1':     10e-1,
+'megpc_theta_2':       0.1,
+'megpc_alpha':         0.5,
+}
