@@ -1,0 +1,5 @@
+{
+# Names of the input variables, in order.
+'inputs': ['e'],
+'noise_lims': [1e-5]
+}

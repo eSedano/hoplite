@@ -1,0 +1,31 @@
+double large_opchain(double a, double b, double c, double d){
+    double ab = a * b;
+    double ac = a * c;
+    double ad = a * d;
+    double bc = b * c;
+    double bd = b * d;
+    double cd = c * d;
+    double p01 = ab + ab;
+    double p02 = ab + ac;
+    double p03 = ac + ac;
+    double p04 = ad + ac;
+    double p05 = ad + ad;
+    double p06 = ab + ad;
+    double p07 = bc + bc;
+    double p08 = bc + bd;
+    double p09 = bd + bd;
+    double p10 = bd + cd;
+    double p11 = cd + cd;
+    double p12 = bc + cd;
+    double q01 = p01 * p02;
+    double q02 = p03 * p04;
+    double q03 = p05 * p06;
+    double q04 = p07 * p08;
+    double q05 = p09 * p10;
+    double q06 = p11 * p12;
+    double r01 = q01 + q02;
+    double r02 = r01 + q03;
+    double r03 = q04 + q05;
+    double r04 = r03 + q06;
+    return r02 + r04;
+}

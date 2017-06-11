@@ -1,0 +1,5 @@
+{
+# Names of the input variables, in order.
+'inputs': ['a', 'nx', 'ny', 'drhovx', 'drhovy', 'drhoe', 'vx', 'vy', 'h', 'drho'],
+'noise_lims': [1e-5]
+}
