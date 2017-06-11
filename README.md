@@ -1,3 +1,4 @@
+´´´
      __  ______  ____  __    ________________
     / / / / __ \/ __ \/ /   /  _/_  __/ ____/
    / /_/ / / / / /_/ / /    / /  / / / __/   
@@ -22,3 +23,4 @@ as well as to modify it, including its main functionalities and API, without pre
 $> hoplite.py --help
 
 on your command line. I hope this engine is useful to you. Now go on and have fun.
+```
