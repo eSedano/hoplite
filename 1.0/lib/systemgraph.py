@@ -17,6 +17,7 @@ The order of the predecessors matter!
 # Imports section
 # ------------------------------------------
 import sys
+import copy
 import sympy
 # -------------------------
 sys.dont_write_bytecode = True
@@ -147,6 +148,8 @@ class SystemGraph(hoplitebase.HopliteBase):
         if d_node['type'] in ['input', 'const']:
             self.fatal('systemgraph.insert_edge() adding %s %d as destination of an edge', d_node['type'], source)
 
+        self.debug('systemgraph.insert_edge: (%d, %d)%s', source, destination, ' no append' if not append else '')
+
         # Connect source and destination
         s_node['successors'].append(destination)
         # If the function does not append, it searches for the first appearance of None in
@@ -164,23 +167,25 @@ class SystemGraph(hoplitebase.HopliteBase):
         self.debug('systemgraph.insert_edge end')
 
     def remove_node(self, node_id):
-    	""" Removes a node from the graph.
-    	"""
-    	self.debug('systemgraph.remove_node start')
-    	# Check that the node is in the graph.
-    	if node_id not in self._nodes:
-    		self.fatal('systemgraph.remove_node() node %d not in the graph', node_id)
+        """ Removes a node from the graph.
+        """
+        self.debug('systemgraph.remove_node start')
+        # Check that the node is in the graph.
+        if node_id not in self._nodes:
+            self.fatal('systemgraph.remove_node() node %d not in the graph', node_id)
 
-    	node = self._nodes[node_id]
+        node = self._nodes[node_id]
 
-    	# Remove all the edges connected to the node to remove
-    	_ = [self.remove_edge(p, node_id) for p in node.get('predecessors', [])]
-    	_ = [self.remove_edge(node_id, s) for s in node.get('successors', [])]
+        self.debug('systemgraph.remove_node: %d', node_id)
 
-    	# Remove the node itself
-    	del self._nodes[node_id]
+        # Remove all the edges connected to the node to remove
+        _ = [self.remove_edge(p, node_id) for p in node.get('predecessors', [])]
+        _ = [self.remove_edge(node_id, s) for s in node.get('successors', [])]
 
-    	self.debug('systemgraph.remove_node end')
+        # Remove the node itself
+        del self._nodes[node_id]
+
+        self.debug('systemgraph.remove_node end')
 
     def remove_edge(self, source, destination):
         """ Removes the egde between two nodes.
@@ -201,6 +206,8 @@ class SystemGraph(hoplitebase.HopliteBase):
         if not source in d_node.get('predecessors', []):
             self.fatal('systemgraph.remove_edge() %d is not a predecessor of %d', source ,destination)
 
+        self.debug('systemgraph.remove_edge: (%d, %d)', source, destination)
+
         # The first appearance of the node in the successors list of the source is eliminated, as
         # order is irrelevant in this case.
         s_node['successors'].remove(destination)
@@ -210,6 +217,25 @@ class SystemGraph(hoplitebase.HopliteBase):
         d_node['predecessors'][d_node['predecessors'].index(source)] = None
 
         self.debug('systemgraph.remove_edge end')
+
+    def declutter(self):
+        """ Removes dead code from the graph. This is done by recursively removing all non-output
+        nodes without successors until the graph is unmodified.
+        """
+        self.debug('systemgraph.declutter begin')
+        # We need to iterate over a copy of the nodes list, otherwise the iterator breaks as soon
+        # as one element in the dictionary is removed.
+        nodes = copy.deepcopy(self._nodes)
+        # The generator will create a list with a None for each node it removed. Such a list with
+        # at least one element in it will be evaluated as True by the if condition, and trigger
+        # a new pass of the declutter function to check if the removed nodes have caused any other
+        # non-output nodes to be out of successors. Once no node is removed in a pass, the list
+        # will be empty and evaluated to false, breaking the recurson and finishing the function.
+        #
+        # "To understand recursion, you must first understand recursion" 
+        if [self.remove_node(k) for k, v in nodes.iteritems() if not v.get('successors', True)]:
+            self.declutter()
+        self.debug('systemgraph.declutter end')
 
 # --------------------------------------------------------------------------------------------------
 #   0    1    1    2    2    3    3    4    4    5    5    6    6    7    7    8    8    9    9    0
