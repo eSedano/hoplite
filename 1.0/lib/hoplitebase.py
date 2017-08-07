@@ -13,6 +13,7 @@ Base class for all Hoplite classes
 import os
 import sys
 import logging
+import yaml
 # -------------------------
 sys.dont_write_bytecode = True
 # -------------------------
@@ -37,7 +38,7 @@ class HopliteBase(object):
     generic across all modules. Mainly logging functionalities for now.
     """
 
-    def __init__(self, name, work_path=None, log=None):
+    def __init__(self, name, parent=None, work_path=None, log=None):
         # Use current directory unless specified otherwise
         self._work_path = work_path if work_path else os.getcwd()
         if not os.path.exists(self._work_path):
@@ -46,6 +47,8 @@ class HopliteBase(object):
         self._log = log if log else name
         self._configure_log(self._log)
         self._logger = logging.getLogger(self._log)
+        self._parent = parent
+        self._config = self._load_config(name)
 
     def info(self, message, *args):
         """Shortcut for printing info messages.
@@ -95,7 +98,6 @@ class HopliteBase(object):
     @staticmethod
     def _configure_logger(logger, handler, level, log_format, date_format=None):
         """ Configure the given logger with the provided formats.
-
         Args:
             log (logging.Logger): Logger that is being modified.
             handler (logging.[File|Stream]Handler): Handler to be configured.
@@ -107,6 +109,20 @@ class HopliteBase(object):
         formatter = logging.Formatter(log_format, date_format)
         handler.setFormatter(formatter)
         logger.addHandler(handler)
+
+    def _load_config(self, name):
+        """ Loads the config file of the class.
+        """
+        # The .hop file must be on the same folder as the source .py file. Look for it and parse
+        # its contents as a YAML file.
+        config_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '%s.hop' % name)
+        if not os.path.exists(config_path):
+            self.fatal('Configuration file for class %s not found', name)
+        with open(config_path, 'r') as stream:
+            # Beware, if something is wrong with the file (for example bad YAML formatting) this
+            # will explode big time.
+            config = yaml.load(stream)
+        return config
 
 # --------------------------------------------------------------------------------------------------
 #   0    1    1    2    2    3    3    4    4    5    5    6    6    7    7    8    8    9    9    0
