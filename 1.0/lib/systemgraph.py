@@ -1,3 +1,4 @@
+#
 # --------------------------------------------------------------------------------------------------
 #     __  ______  ____  __    ________________
 #    / / / / __ \/ __ \/ /   /  _/_  __/ ____/
@@ -35,8 +36,8 @@ SUPPORTED_OPERATIONS = ['null', 'add', 'sub', 'mul', 'div', 'const', 'input', 'o
 class SystemGraph(hoplitebase.HopliteBase):
     """ SystemGraph class
     """
-    def __init__(self, log='systemgraph'):
-        super(SystemGraph, self).__init__(log)
+    def __init__(self, parent=None, work_path=None, log=None):
+        super(SystemGraph, self).__init__('systemgraph', parent, work_path, log)
         self._node_id = 0
         self._nodes = {}
 
