@@ -1,0 +1,19 @@
+#
+# --------------------------------------------------------------------------------------------------
+#     __  ______  ____  __    ________________
+#    / / / / __ \/ __ \/ /   /  _/_  __/ ____/
+#   / /_/ / / / / /_/ / /    / /  / / / __/
+#  / __  / /_/ / ____/ /____/ /  / / / /___
+# /_/ /_/\____/_/   /_____/___/ /_/ /_____/   (v1.0 . Achilles)
+#
+# Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+# --------------------------------------------------------------------------------------------------
+
+# Input/output tool
+input_output: llvm
+# Floating/Fixed Point model
+numeric_model: pce
+# Search tool for word length optimisation
+wl_optimiser: min_plus_one
+# Graph partitioner
+partitioner_tool: metis
