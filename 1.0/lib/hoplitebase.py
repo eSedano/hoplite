@@ -118,7 +118,8 @@ class HopliteBase(object):
         # its contents as a YAML file.
         config_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '%s.hop' % name)
         if not os.path.exists(config_path):
-            self.fatal('Configuration file for class %s not found', name)
+            self.debug('%s._load_config() does not have associated .hop file', name)
+            return {}
         with open(config_path, 'r') as stream:
             # Beware, if something is wrong with the file (for example bad YAML formatting) this
             # will explode big time.

@@ -17,9 +17,11 @@ The order of the predecessors matter!
 # ------------------------------------------
 # Imports section
 # ------------------------------------------
+import os
 import sys
 import copy
 import sympy
+import graphviz
 # -------------------------
 sys.dont_write_bytecode = True
 # -------------------------
@@ -68,7 +70,7 @@ class SystemGraph(hoplitebase.HopliteBase):
     # ------------------------------------------
     # Public operations of SystemGraph
     # ------------------------------------------
-    def insert_node(self, operation, value=None):
+    def insert_node(self, operation, name=None, value=None):
         """ Introduces a new node of the indicated operation in the system graph. If the
         operation is a constant, the insertion additionally requires a value to be specified.
         Any value passed to the insertion for non-constant operation will be ignored.
@@ -102,7 +104,8 @@ class SystemGraph(hoplitebase.HopliteBase):
         # +===================+===============+==================================================+
         node = {
             'type': operation,
-            'id': node_id
+            'id': node_id,
+            'name': name if not name is None else '%s.%s' % (operation, node_id)
         }
         if operation not in ['input', 'const']:
             node['predecessors'] = []
@@ -112,6 +115,7 @@ class SystemGraph(hoplitebase.HopliteBase):
             # Transform the value of the constant to the internal sympy representation.
             # While doing this, we check that the value argument is provided and it is valid.
             try:
+                node['name'] = str(float(value))
                 node['value'] = sympy.S(float(value))
             except ValueError:
                 self.fatal('systemgraph.insert_node() argument cannot be converted to float')
@@ -237,6 +241,14 @@ class SystemGraph(hoplitebase.HopliteBase):
         if [self.remove_node(k) for k, v in nodes.iteritems() if not v.get('successors', True)]:
             self.declutter()
         self.debug('systemgraph.declutter end')
+
+    def print_graph(self, graph_id='systemgraph', out_format='pdf'):
+        """ Generates a PDF representation of the graph.
+            """
+        dot = graphviz.Digraph(comment=graph_id, format=out_format)
+        _ = [dot.node(str(n), d['name']) for n, d in self._nodes.iteritems()]
+        _ = [dot.edge(str(n), str(s)) for n, d in self._nodes.iteritems() for s in d.get('successors', [])]
+        dot.render(os.path.join(self._work_path, '%s.%s' % (graph_id, out_format)))
 
 # --------------------------------------------------------------------------------------------------
 #   0    1    1    2    2    3    3    4    4    5    5    6    6    7    7    8    8    9    9    0
