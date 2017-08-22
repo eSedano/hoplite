@@ -68,6 +68,24 @@ class SystemGraph(hoplitebase.HopliteBase):
     # ------------------------------------------
 
     # ------------------------------------------
+    # Input nodes
+    # ------------------------------------------
+    @property
+    def inputs(self):
+        """ Property to get the inputs of the system graph
+        """
+        return [n for _, n in self._nodes if n['type'] in ['input']]
+
+    @inputs.setter
+    def inputs(self, value):
+        pass # Writes to inputs are ignored.
+
+    @inputs.deleter
+    def inputs(self):
+        pass  # Deletion of inputs are ignored.
+    # ------------------------------------------
+
+    # ------------------------------------------
     # Public operations of SystemGraph
     # ------------------------------------------
     def insert_node(self, operation, name=None, value=None):
@@ -243,12 +261,23 @@ class SystemGraph(hoplitebase.HopliteBase):
         self.debug('systemgraph.declutter end')
 
     def print_graph(self, graph_id='systemgraph', out_format='pdf'):
-        """ Generates a PDF representation of the graph.
-            """
+        """ Generates a graphical representation of the graph.
+        """
+        self.debug('systemgraph.print_graph begin')
+
         dot = graphviz.Digraph(comment=graph_id, format=out_format)
+        # Put the nodes in a graphviz-compliant format:
+        # http://graphviz.readthedocs.io/en/stable/manual.html
+        # As the SystemGraph grows, new fancy formats for the nodes may be added here.
         _ = [dot.node(str(n), d['name']) for n, d in self._nodes.iteritems()]
         _ = [dot.edge(str(n), str(s)) for n, d in self._nodes.iteritems() for s in d.get('successors', [])]
+        # Print the graph.
         dot.render(os.path.join(self._work_path, '%s.%s' % (graph_id, out_format)))
+
+        self.debug('systemgraph.print_graph end')
+
+    def __str__(self):
+        return str(self._nodes.values())
 
 # --------------------------------------------------------------------------------------------------
 #   0    1    1    2    2    3    3    4    4    5    5    6    6    7    7    8    8    9    9    0

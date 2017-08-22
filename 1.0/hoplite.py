@@ -11,6 +11,8 @@
 """
 Main Hoplite class. Doubles as self-executable script
 """
+import argparse
+
 
 class Hoplite(lib.hoplitebase.HopliteBase):
     """docstring for Hoplite"""
@@ -85,3 +87,41 @@ class Hoplite(lib.hoplitebase.HopliteBase):
 
 if __name__ == "__main__":
 
+    # -----------------------------------------------------------------
+    # Parse arguments from input and configure help info.
+    #
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        'source',
+        type=str,
+        help='Absolute path to the source definition of the function to analyze.'
+    )
+    parser.add_argument(
+        '-k', '--keep',
+        action='store_true',
+        help='Keeps the intermediate generated files, if any.'
+    )
+    parser.add_argument(
+        '-o',
+        '--output',
+        type=str,
+        help='Path to the destination folder.')
+    parser.add_argument(
+        '-i', "--iointerface",
+        type=str,
+        choices=['llvm', 'xml'], 
+        help='Input tool that will generate the system graph. Overwrites the value stored in the configuration file.'
+    )
+    parser.add_argument(
+        '-m', '--model',
+        type=str,
+        choices=['montecarlo'], 
+        help='Analytical or simulation model for the system. Overwrites the value stored in the configuration file.'
+    )
+    parser.add_argument(
+        '-p', '--partitioner',
+        type=str,
+        choices=['random', 'ordered', 'hierfm', 'metis'], 
+        help='Indicates the type of partitioner, if needed, the system will use.'
+    )
+    args = parser.parse_args()
