@@ -9,11 +9,11 @@
 # Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
 # --------------------------------------------------------------------------------------------------
 
-# Input/output tool
-input_output: llvm
-# Floating/Fixed Point model
-numeric_model: pce
-# Search tool for word length optimisation
-wl_optimiser: min_plus_one
-# Graph partitioner
-partitioner_tool: metis
+# Allowed Input/Output tools. Default is the one at position 0.
+io_interface_tools: [llvm, xml]
+# Allowed Input/Output tools. Default is the one at position 0.
+sn_model_tools: [montecarlo, polynomialchaos]
+# Allowed Input/Output tools. Default is the one at position 0.
+wl_optimiser_tools: [minplusone]
+# Allowed Input/Output tools. Default is the one at position 0.
+partitioner_tools: [metis, random]

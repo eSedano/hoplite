@@ -46,3 +46,4 @@ class MonteCarlo(hoplitebase.HopliteBase):
 
     def _calculate(self, node_id):
 #        ['null', 'add', 'sub', 'mul', 'div', 'const', 'input', 'output']
+        pass

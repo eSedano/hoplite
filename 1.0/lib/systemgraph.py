@@ -68,24 +68,6 @@ class SystemGraph(hoplitebase.HopliteBase):
     # ------------------------------------------
 
     # ------------------------------------------
-    # Input nodes
-    # ------------------------------------------
-    @property
-    def inputs(self):
-        """ Property to get the inputs of the system graph
-        """
-        return [n for _, n in self._nodes if n['type'] in ['input']]
-
-    @inputs.setter
-    def inputs(self, value):
-        pass # Writes to inputs are ignored.
-
-    @inputs.deleter
-    def inputs(self):
-        pass  # Deletion of inputs are ignored.
-    # ------------------------------------------
-
-    # ------------------------------------------
     # Public operations of SystemGraph
     # ------------------------------------------
     def insert_node(self, operation, name=None, value=None):
@@ -255,11 +237,42 @@ class SystemGraph(hoplitebase.HopliteBase):
         # non-output nodes to be out of successors. Once no node is removed in a pass, the list
         # will be empty and evaluated to false, breaking the recurson and finishing the function.
         #
-        # "To understand recursion, you must first understand recursion" 
+        # "To understand recursion, you must first understand recursion"
         if [self.remove_node(k) for k, v in nodes.iteritems() if not v.get('successors', True)]:
             self.declutter()
         self.debug('systemgraph.declutter end')
 
+    # ------------------------------------------
+    # Access to elements
+    # ------------------------------------------
+    def ids(self, operation=None):
+        """ Get the list of IDs for the specified operation(s). If no operation is provided,
+        all IDs are returned. Non supported operations are ignored.
+        """
+        self.debug('systemgraph.ids begin')
+
+        # No operation provided, return all the IDs
+        if operation is None:
+            return [n for n in self._nodes]
+        # Single operation provided, passed as a string. Return IDs for that operation.
+        if isinstance(operation, str):
+            return [n for n, c in self._nodes.iteritems() if c['type'] == operation]
+        # Single or multiple operations provided, passed as a list of strings. Return IDs for them.
+        if isinstance(operation, list) and all(isinstance(n, str) for n in operation):
+            return [n for n, c in self._nodes.iteritems() if c['type'] in operation]
+        # None of the above formats provided. Crash graciously.
+        self.fatal('systemgraph.ids() The provided input is in a non-parsable format.')
+
+        self.debug('systemgraph.ids end')
+
+    def node(self, node_id):
+        """ Get all the information for the provided node ID. Unknown node IDs return empty dict.
+        """
+        return self._nodes.get(node_id, {})
+
+    # ------------------------------------------
+    # Outputting the graph
+    # ------------------------------------------
     def print_graph(self, graph_id='systemgraph', out_format='pdf'):
         """ Generates a graphical representation of the graph.
         """

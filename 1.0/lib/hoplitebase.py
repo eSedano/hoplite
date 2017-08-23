@@ -13,6 +13,7 @@ Base class for all Hoplite classes
 """
 import os
 import sys
+import copy
 import logging
 import yaml
 # -------------------------
@@ -52,30 +53,52 @@ class HopliteBase(object):
         self._config = self._load_config(name)
 
     def info(self, message, *args):
-        """Shortcut for printing info messages.
+        """ Shortcut for printing info messages.
         """
         self._logger.info(message, *args)
 
     def warning(self, message, *args):
-        """Shortcut for printing warning messages.
+        """ Shortcut for printing warning messages.
         """
         self._logger.warning(message, *args)
 
     def error(self, message, *args):
-        """Shortcut for printing error messages.
+        """ Shortcut for printing error messages.
         """
         self._logger.error(message, *args)
 
     def debug(self, message, *args):
-        """Shortcut for printing debug messages.
+        """ Shortcut for printing debug messages.
         """
         self._logger.debug(message, *args)
 
     def fatal(self, message, *args):
-        """Shortcut for printing error messages. Additionaly, raises an exception.
+        """ Shortcut for printing error messages. Additionaly, raises an exception.
         """
         self._logger.error(message, *args)
         raise HopliteError(message % args)
+
+    def pre(self):
+        """ Pre-call step for HOPLITE modules.
+        """
+        pass
+
+    def post(self):
+        """ Post-call step for HOPLITE modules.
+        """
+        pass
+
+    @property
+    def config(self):
+        return self._config
+
+    @config.setter
+    def config(self, value):
+        pass # Writes to config are ignored.
+
+    @config.deleter
+    def config(self):
+        del self._config
 
     def _configure_log(self, name):
         """Configure the log and the output format, both for file-based and shell output.
@@ -90,7 +113,7 @@ class HopliteBase(object):
         log_format = '%(name)s - %(message)s'
         self._configure_logger(logger, handler, level, log_format)
         # Configure file logging
-        handler = logging.FileHandler(destination, 'w', encoding=None, delay='true')
+        handler = logging.FileHandler(destination, 'a', encoding=None, delay='true')
         level = LOGGING_LEVEL
         log_format = '[%(asctime)s] %(levelname)s - %(message)s'
         date_format = '%Y/%m/%d %H:%M:%S'
