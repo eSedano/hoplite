@@ -15,6 +15,8 @@ import os
 import sys
 import argparse
 
+sys.dont_generate_bytecode = True
+
 from inspect import getmembers, isclass
 
 from lib import hoplitebase
@@ -33,31 +35,41 @@ class Hoplite(hoplitebase.HopliteBase):
         self._wloptimiser = None
         self._snmodel = None
 
+        # Small tweak (rules are mede to be broken, right?) to add the base path
+        # of the installation path to the configuration, in case other resources
+        # need it.
+        self._config['base_path'] = os.path.dirname(os.path.realpath(__file__))
+
     def run(self, source, keep=False):
         """ Main HOPLITE function. Invokes the calling sequence, including pre- and post- calls for
         each of the steps.
         """
         # I/O interface - Populate system graph.
-        self._iointerface.pre()
-        self._iointerface.get_graph(source)
+        self.iointerface.pre()
+        self.iointerface.get_graph(source)
 
         # Signal/Noise model - Apply the model or prepare it for execution on demand.
-        self._snmodel.pre()
-        self._snmodel.compute()
-        self._snmodel.post()
+        self.snmodel.pre()
+        self.snmodel.compute()
+        self.snmodel.post()
 
         # Word-length optimiser - Traverse the solution space in search for an optimised WL vector.
-        self._wloptimiser.pre()
-        if self._wloptimiser.config.get('single_search_call', False):
-            self._wloptimiser.search()
+        self.wloptimiser.pre()
+        if self.wloptimiser.config.get('single_search_call', False):
+            self.wloptimiser.search()
         else:
-            self._wloptimiser.dynamic_range()
-            self._wloptimiser.fractional_length()
-        self._wloptimiser.post()
+            self.wloptimiser.dynamic_range()
+            self.wloptimiser.fractional_length()
+        self.wloptimiser.post()
 
-        # /O interface - Retirve the calculated word-lengths.
-        self._iointerface.get_wl()
-        self._iointerface.post()
+        self.iointerface.get_wl()
+        self.iointerface.post()
+
+        if not keep:
+            self.snmodel.cleanup()
+            self.iointerface.cleanup()
+            self.wloptimiser.cleanup()
+            self.partitioner.cleanup()
 
     # ------------------------------------------
     # System Graph (Property, Setter and Getter)
@@ -297,7 +309,8 @@ if __name__ == "__main__":
     # Proceed with the calling sequence.
     #
     ACHILLES.run(ARGS.source, ARGS.keep)
-    # -----------------------------------------------------------------    
+    print ACHILLES.systemgraph
+    # -----------------------------------------------------------------
 
 # --------------------------------------------------------------------------------------------------
 #   0    1    1    2    2    3    3    4    4    5    5    6    6    7    7    8    8    9    9    0

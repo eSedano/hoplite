@@ -88,6 +88,11 @@ class HopliteBase(object):
         """
         pass
 
+    def cleanup(self):
+        """ Cleanup stub for HOPLITE modules.
+        """
+        pass
+
     @property
     def config(self):
         return self._config
