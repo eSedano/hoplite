@@ -1,2 +1,2 @@
-'inputs': ['a', 'b', 'c'],
-'noise_lims': [1e-5]
+inputs: ['a', 'b', 'c'],
+noise_limits: [1e-5]
